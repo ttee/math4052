@@ -1,0 +1,19 @@
+{
+  "name": "math4052-quiz-app",
+  "version": "1.0.0",
+  "description": "A full-stack mathematics quiz application with user authentication and progress tracking",
+  "scripts": {
+    "dev:backend": "cd math4052-backend && npm start",
+    "dev:frontend": "cd math4052-frontend && npm run dev",
+    "build:frontend": "cd math4052-frontend && npm run build",
+    "install:all": "cd math4052-backend && npm install && cd ../math4052-frontend && npm install",
+    "deploy:setup": "npm run install:all && npm run build:frontend"
+  },
+  "keywords": ["math", "quiz", "education", "react", "nodejs", "mongodb"],
+  "author": "Math4052 Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/math4052.git"
+  }
+}
