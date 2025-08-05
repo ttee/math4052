@@ -23,7 +23,9 @@ echo Steps to create a Personal Access Token:
 echo 1. Go to: https://github.com/settings/tokens
 echo 2. Click "Generate new token (classic)"
 echo 3. Give it a name (e.g., "math4052-push")
-echo 4. Select scopes: [x] repo (all)
+echo 4. Select scopes:
+echo    [x] repo (all)
+echo    [x] workflow (for GitHub Actions)
 echo 5. Click "Generate token"
 echo 6. COPY THE TOKEN NOW (you won't see it again!)
 echo.
