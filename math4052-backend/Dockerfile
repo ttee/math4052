@@ -1,5 +1,7 @@
-FROM node:16-alpine
+# Backend Dockerfile
+FROM node:18-alpine
 
+# Set working directory
 WORKDIR /app
 
 # Copy package files

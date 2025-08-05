@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6
+    container_name: math4052-mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: math4052
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - math4052-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./math4052-backend
+      dockerfile: Dockerfile
+    container_name: math4052-backend
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017/math4052?authSource=admin
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=5000
+      - FRONTEND_URL=${FRONTEND_URL}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+    depends_on:
+      - mongodb
+    networks:
+      - math4052-network
+
+  # Frontend with Nginx
+  frontend:
+    build:
+      context: ./math4052-frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${BACKEND_URL}
+    container_name: math4052-frontend
+    restart: always
+    depends_on:
+      - backend
+    networks:
+      - math4052-network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: math4052-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - math4052-network
+
+networks:
+  math4052-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:

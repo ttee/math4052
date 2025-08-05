@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6
+    container_name: math4052-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: math4052
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - math4052-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./math4052-backend
+      dockerfile: Dockerfile
+    container_name: math4052-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongodb:27017/math4052
+      - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_key_here}
+      - PORT=5000
+      - FRONTEND_URL=http://localhost:3000
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-your_stripe_secret_key_here}
+    depends_on:
+      - mongodb
+    networks:
+      - math4052-network
+    volumes:
+      - ./math4052-backend:/app
+      - /app/node_modules
+
+  # Frontend
+  frontend:
+    build:
+      context: ./math4052-frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:5000
+    container_name: math4052-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - math4052-network
+
+networks:
+  math4052-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
